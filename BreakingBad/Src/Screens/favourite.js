@@ -7,7 +7,7 @@ import CharecterList from '../Component/character';
 const Devicewidth = Dimensions.get('window').width;
 const Deviceheight = Dimensions.get('window').height;
 
-const DriverLists = [
+const CharecterLists = [
   {
     id: '1',
     Name: "Walter White",
@@ -87,13 +87,14 @@ const DriverLists = [
   },
 ]
 
+
 export default class Favourite extends Component {
   componentDidMount=async()=> {
-    // const value = await AsyncStorage.getItem('FavouriteCharacter');
     const MyFavouriteCharecterID = this.props.route.params.CharecterId;
-    console.log("my_id", MyFavouriteCharecterID);
   }
-
+  GoToDeatails=(CharacterID)=>{
+    this.props.navigation.navigate('details',{"PressedCharacterID":CharacterID})
+  }
   render() {
     return (
       <>
@@ -113,7 +114,7 @@ export default class Favourite extends Component {
         {/* Scroll Section */}
         <View style={styles.FlatlistContainer}>
           <FlatList
-            data={DriverLists}
+            data={CharecterLists}
             showsVerticalScrollIndicator={false}
             horizontal={false}
             numColumns={2}
@@ -126,6 +127,7 @@ export default class Favourite extends Component {
                   CahrecterName={item.Name}
                   navigation={this.props.navigation}
                   ScreenName={"favourite"}
+                  HandelCharacterTouch ={(id)=>this.GoToDeatails(id)}
                 />
               </View>
             )}

@@ -8,7 +8,7 @@ import CharecterList from '../Component/character';
 const Devicewidth = Dimensions.get('window').width;
 const Deviceheight = Dimensions.get('window').height;
 
-const DriverLists = [
+const CharecterLists = [
   {
     id: '1',
     Name: "Walter White",
@@ -89,6 +89,13 @@ const DriverLists = [
 ]
 
 export default class Home extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      MyFavouriteIds: []
+    }
+  }
+  state = this.state;
   componentDidMount() {
 
   }
@@ -99,7 +106,11 @@ export default class Home extends Component {
     this.props.navigation.navigate('favourite')
   }
   HandelFavuriteClick = (FavouriteID) => {
-    console.log("my fav id", FavouriteID);
+    console.log("my fav id ", FavouriteID);
+    
+  }
+  GoToDeatails = (CharacterID) => {
+    this.props.navigation.navigate('details', { "PressedCharacterID": CharacterID })
   }
   render() {
     return (
@@ -123,7 +134,7 @@ export default class Home extends Component {
           {/* Scroll Section */}
           <View style={styles.FlatlistContainer}>
             <FlatList
-              data={DriverLists}
+              data={CharecterLists}
               showsVerticalScrollIndicator={false}
               horizontal={false}
               numColumns={2}
@@ -137,6 +148,7 @@ export default class Home extends Component {
                     navigation={this.props.navigation}
                     ScreenName={"home"}
                     HandelFavouriteCharecter={(id) => this.HandelFavuriteClick(id)}
+                    HandelCharacterTouch={(id) => this.GoToDeatails(id)}
                   />
                 </View>
               )}
