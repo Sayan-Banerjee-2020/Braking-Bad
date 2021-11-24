@@ -4,100 +4,35 @@ import AsyncStorage from '@react-native-community/async-storage';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CharecterList from '../Component/character';
-
+import axios from "axios"
 const Devicewidth = Dimensions.get('window').width;
 const Deviceheight = Dimensions.get('window').height;
 
-const CharecterLists = [
-  {
-    id: '1',
-    Name: "Walter White",
-    NickName: 'Heisenberg',
-    Image: require('../Assets/walter.png')
-  },
-  {
-    id: '2',
-    Name: "Jesse Pinkman",
-    NickName: "Cap n' Cook",
-    Image: require('../Assets/pinkman.png')
-  },
-  {
-    id: '3',
-    Name: "Skyler White",
-    NickName: 'Sky',
-    Image: require('../Assets/skyler.png')
-  },
-  {
-    id: '4',
-    Name: "Mike Ehrmantraut",
-    NickName: 'Mike',
-    Image: require('../Assets/mike.png')
-  },
-  {
-    id: '5',
-    Name: "Walter White",
-    NickName: 'Heisenberg',
-    Image: require('../Assets/walter.png')
-  },
-  {
-    id: '6',
-    Name: "Jesse Pinkman",
-    NickName: "Cap n' Cook",
-    Image: require('../Assets/pinkman.png')
-  },
-  {
-    id: '7',
-    Name: "Skyler White",
-    NickName: 'Sky',
-    Image: require('../Assets/skyler.png')
-  },
-  {
-    id: '8',
-    Name: "Mike Ehrmantraut",
-    NickName: 'Mike',
-    Image: require('../Assets/mike.png')
-  }, {
-    id: '9',
-    Name: "Walter White",
-    NickName: 'Heisenberg',
-    Image: require('../Assets/walter.png')
-  },
-  {
-    id: '10',
-    Name: "Jesse Pinkman",
-    NickName: "Cap n' Cook",
-    Image: require('../Assets/pinkman.png')
-  },
-  {
-    id: '11',
-    Name: "Skyler White",
-    NickName: 'Sky',
-    Image: require('../Assets/skyler.png')
-  },
-  {
-    id: '14',
-    Name: "Mike Ehrmantraut",
-    NickName: 'Mike',
-    Image: require('../Assets/mike.png')
-  },
-  {
-    id: '15',
-    Name: "Jesse Pinkman",
-    NickName: "Cap n' Cook",
-    Image: require('../Assets/pinkman.png')
-  },
-]
 
 export default class Home extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      AllCharacters: [],
       MyFavouriteIds: []
     }
   }
   state = this.state;
   componentDidMount() {
 
+    axios.get(`https://www.breakingbadapi.com/api/characters`)
+      .then(response => {
+        console.log("my user Details response", response);
+        if (response.status == 200) {
+          this.setState({
+            AllCharacters: response.data
+          })
+        }
+
+      })
+      .catch(error => {
+        console.error(error.data)
+      })
   }
   HandelSearch = () => {
     this.props.navigation.navigate('search')
@@ -106,11 +41,23 @@ export default class Home extends Component {
     this.props.navigation.navigate('favourite')
   }
   HandelFavuriteClick = (FavouriteID) => {
-    console.log("my fav id ", FavouriteID);
-    
+    console.log("array", this.state.MyFavouriteIds);
+    if(this.state.MyFavouriteIds.indexOf(FavouriteID) !== -1){
+      this.state.MyFavouriteIds.splice(this.state.MyFavouriteIds.indexOf(FavouriteID),1)
+    }
+    else{
+      this.state.MyFavouriteIds.push(FavouriteID)
+    }
+    this.setState({
+      MyFavouriteIds:this.state.MyFavouriteIds
+    })
+    console.log("array11", this.state.MyFavouriteIds);
+    AsyncStorage.setItem('FavArray', JSON.stringify(this.state.MyFavouriteIds))
+
   }
   GoToDeatails = (CharacterID) => {
-    this.props.navigation.navigate('details', { "PressedCharacterID": CharacterID })
+    let res = this.state.AllCharacters.find(obj => { return obj.char_id === CharacterID })
+    this.props.navigation.navigate('details', { "PressedCharacter": res })
   }
   render() {
     return (
@@ -134,25 +81,26 @@ export default class Home extends Component {
           {/* Scroll Section */}
           <View style={styles.FlatlistContainer}>
             <FlatList
-              data={CharecterLists}
+              data={this.state.AllCharacters}
               showsVerticalScrollIndicator={false}
               horizontal={false}
               numColumns={2}
               renderItem={({ item }) => (
                 <View>
                   <CharecterList
-                    CharecterID={item.id}
-                    CahrecterImage={item.Image}
-                    CharecterNickName={item.NickName}
-                    CahrecterName={item.Name}
+                    CharecterID={item.char_id}
+                    CahrecterImage={item.img}
+                    CharecterNickName={item.nickname}
+                    CahrecterName={item.name}
                     navigation={this.props.navigation}
                     ScreenName={"home"}
                     HandelFavouriteCharecter={(id) => this.HandelFavuriteClick(id)}
                     HandelCharacterTouch={(id) => this.GoToDeatails(id)}
+                    FavouriteID={this.state.MyFavouriteIds}
                   />
                 </View>
               )}
-              keyExtractor={item => item.id}
+              keyExtractor={item => item.char_id}
             />
           </View>
         </View>
@@ -180,7 +128,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: "#ffffff",
     fontWeight: '600',
-    textAlign: "left"
+    textAlign: "left",
+    fontFamily: "Roboto-Bold"
   },
   HeaderBthContainer: {
     flexDirection: "row",

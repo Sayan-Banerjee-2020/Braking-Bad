@@ -7,109 +7,6 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 const Devicewidth = Dimensions.get('window').width;
 const Deviceheight = Dimensions.get('window').height;
 
-const CharecterLists = [
-  {
-    id: '1',
-    Name: "Walter White",
-    NickName: 'Heisenberg',
-    Image: require('../Assets/walter.png')
-  },
-  {
-    id: '2',
-    Name: "Jesse Pinkman",
-    NickName: "Cap n' Cook",
-    Image: require('../Assets/pinkman.png')
-  },
-  {
-    id: '3',
-    Name: "Skyler White",
-    NickName: 'Sky',
-    Image: require('../Assets/skyler.png')
-  },
-  {
-    id: '4',
-    Name: "Mike Ehrmantraut",
-    NickName: 'Mike',
-    Image: require('../Assets/mike.png')
-  },
-  {
-    id: '5',
-    Name: "Walter White",
-    NickName: 'Heisenberg',
-    Image: require('../Assets/walter.png')
-  },
-  {
-    id: '6',
-    Name: "Jesse Pinkman",
-    NickName: "Cap n' Cook",
-    Image: require('../Assets/pinkman.png')
-  },
-  {
-    id: '7',
-    Name: "Skyler White",
-    NickName: 'Sky',
-    Image: require('../Assets/skyler.png')
-  },
-  {
-    id: '8',
-    Name: "Mike Ehrmantraut",
-    NickName: 'Mike',
-    Image: require('../Assets/mike.png')
-  },
-  {
-    id: '9',
-    Name: "Walter White",
-    NickName: 'Heisenberg',
-    Image: require('../Assets/walter.png')
-  },
-  {
-    id: '10',
-    Name: "Jesse Pinkman",
-    NickName: "Cap n' Cook",
-    Image: require('../Assets/pinkman.png')
-  },
-  {
-    id: '11',
-    Name: "Skyler White",
-    NickName: 'Sky',
-    Image: require('../Assets/skyler.png')
-  },
-  {
-    id: '14',
-    Name: "Mike Ehrmantraut",
-    NickName: 'Mike',
-    Image: require('../Assets/mike.png')
-  },
-  {
-    id: '15',
-    Name: "Jesse Pinkman",
-    NickName: "Cap n' Cook",
-    Image: require('../Assets/pinkman.png')
-  },
-]
-
-const SeasonList = [
-  {
-    id: '1',
-    SeasonName: "Season 1"
-  },
-  {
-    id: '2',
-    SeasonName: "Season 2"
-  },
-  {
-    id: '3',
-    SeasonName: "Season 3"
-  },
-  {
-    id: '4',
-    SeasonName: "Season 4"
-  },
-  {
-    id: '5',
-    SeasonName: "Season 5"
-  },
-]
 const OtherCharacter = [
   {
     id: '1',
@@ -147,17 +44,13 @@ export default class Details extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      MyCharacter: {}
+      MyCharacter: {},
     }
   }
   state = this.state;
   componentDidMount() {
-    const MyID = this.props.route.params.PressedCharacterID
-    let res = CharecterLists.find(obj => { return obj.id === MyID })
-    this.setState({ MyCharacter: res })
-
+    this.setState({ MyCharacter: this.props.route.params.PressedCharacter })
   }
-
   render() {
     return (
       <>
@@ -166,7 +59,7 @@ export default class Details extends Component {
           <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={"always"}>
             <ImageBackground
               style={styles.ImageBackground}
-              source={this.state.MyCharacter.Image} >
+              source={{ uri: this.state.MyCharacter.img }} >
               {/* Header Section */}
               <View style={styles.HeaderMainCOntainer}>
                 <TouchableOpacity style={styles.SearchIcon} onPress={() => this.props.navigation.navigate('home')}>
@@ -183,11 +76,11 @@ export default class Details extends Component {
                 <View style={styles.MyImageContainer}>
                   <Image
                     style={styles.MyImage}
-                    source={this.state.MyCharacter.Image} />
+                    source={{ uri: this.state.MyCharacter.img }} />
                 </View>
                 <View style={styles.NameContainer}>
-                  <Text style={styles.Name}>{this.state.MyCharacter.Name}</Text>
-                  <Text style={styles.NickName}>{this.state.MyCharacter.NickName}</Text>
+                  <Text style={styles.Name}>{this.state.MyCharacter.name}</Text>
+                  <Text style={styles.NickName}>{this.state.MyCharacter.nickname}</Text>
                 </View>
               </View>
             </ImageBackground>
@@ -195,10 +88,10 @@ export default class Details extends Component {
             <View style={styles.SecondCOntainer}>
               <View style={styles.PotrayedContainer}>
                 <Text style={styles.Potrayed}>Potrayed</Text>
-                <Text style={styles.PotrayedName}>Brayan Cranston</Text>
+                <Text style={styles.PotrayedName}>{this.state.MyCharacter.portrayed}</Text>
               </View>
               <View style={styles.DateContainer}>
-                <Text style={styles.PotrayedName}>09-july-1958</Text>
+                <Text style={styles.PotrayedName}>{this.state.MyCharacter.birthday}</Text>
                 <View style={styles.ImageIcon} onPress={() => this.props.navigation.navigate('home')}>
                   <Image source={require('../Assets/Vector.png')} style={{ height: "100%", width: "100%", resizeMode: "contain" }} />
                 </View>
@@ -207,8 +100,15 @@ export default class Details extends Component {
             {/* occupation section */}
             <View style={styles.ThirdCOntainer}>
               <Text style={styles.Potrayed}>Occupation</Text>
-              <Text style={styles.HighSchool}>High School Chemistry Teacher</Text>
-              <Text style={styles.HighSchool}>King Pin</Text>
+              <FlatList
+                data={this.state.MyCharacter.occupation}
+                showsVerticalScrollIndicator={false}
+                horizontal={false}
+                renderItem={({ item }) => (
+                  <Text style={styles.HighSchool}>{item}</Text>
+                )}
+                keyExtractor={item => item.id}
+              />
             </View>
             {/* Appeared in section */}
             <View style={styles.ForthCOntainer}>
@@ -216,12 +116,12 @@ export default class Details extends Component {
               {/* Scroll Section */}
               <View style={styles.SeasonListContainer}>
                 <FlatList
-                  data={SeasonList}
+                  data={this.state.MyCharacter.appearance}
                   showsHorizontalScrollIndicator={false}
                   horizontal={true}
                   renderItem={({ item }) => (
                     <View style={styles.SeacoonContentContainer}>
-                      <Text style={styles.SeasonContent}>{item.SeasonName}</Text>
+                      <Text style={styles.SeasonContent}>Season {item}</Text>
                     </View>
                   )}
                   keyExtractor={item => item.id}
@@ -289,12 +189,14 @@ const styles = StyleSheet.create({
     fontSize: 40,
     color: "#ffffff",
     textAlign: "center",
-    fontWeight: "bold"
+    fontWeight: "bold",
+    fontFamily:"Roboto-Light"
   },
   NickName: {
     fontSize: 18,
     color: "#ffffff",
-    textAlign: "center"
+    textAlign: "center",
+    fontFamily:'Roboto-Thin'
   },
   HeaderMainCOntainer: {
     height: Deviceheight / 12,
@@ -345,12 +247,14 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: "#18ca75",
     fontWeight: '600',
-    textAlign: "left"
+    textAlign: "left",
+    fontFamily:'Roboto-Light'
   },
   PotrayedName: {
     fontSize: 16,
     color: "#fff",
-    textAlign: "left"
+    textAlign: "left",
+    fontFamily:"Roboto-Light"
   },
   PotrayedContainer: {
     justifyContent: 'flex-start',
@@ -374,7 +278,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   ThirdCOntainer: {
-    height: Deviceheight / 9,
+    // height: Deviceheight / 9,
     width: Devicewidth,
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
@@ -387,7 +291,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
     textAlign: "left",
-    marginTop: 5
+    marginTop: 5,
+    fontFamily:"Roboto-Light"
   },
   ForthCOntainer: {
     height: Deviceheight / 10,
@@ -403,8 +308,8 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     marginTop: 10,
     width: Devicewidth,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
     backgroundColor: '#070707'
   },
   SeacoonContentContainer: {
@@ -420,6 +325,7 @@ const styles = StyleSheet.create({
   SeasonContent: {
     textAlign: "center",
     fontSize: 18,
+    fontFamily:"Roboto-Light"
   },
   OtherCharacterCOntainer: {
     height: Deviceheight / 2.3,
@@ -435,7 +341,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: "left",
     paddingHorizontal: 16,
-    marginBottom: 10
+    marginBottom: 10,
+    fontFamily:"Roboto-Bold"
   },
   OtherCharacterListContainer: {
     marginTop: 10,
@@ -478,11 +385,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#ffffff",
     textAlign: "left",
-    fontWeight: "bold"
+    fontWeight: "bold",
+    fontFamily:'Roboto-Light'
   },
   OtherNickName: {
     fontSize: 15,
     color: "#ffffff",
-    textAlign: "left"
+    textAlign: "left",
+    fontFamily:'Roboto-Thin'
   },
 })

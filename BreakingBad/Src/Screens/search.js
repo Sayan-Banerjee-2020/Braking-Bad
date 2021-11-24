@@ -3,6 +3,7 @@ import { View, Text, Image, Dimensions, TouchableOpacity, StyleSheet, StatusBar,
 import AsyncStorage from '@react-native-community/async-storage';
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import CharecterList from '../Component/character';
+import axios from "axios"
 
 const Devicewidth = Dimensions.get('window').width;
 const Deviceheight = Dimensions.get('window').height;
@@ -40,22 +41,46 @@ export default class Search extends Component {
     super(props)
     this.state = {
       SearchContent: null,
-      SearchCharacters: []
+      SearchCharacters: [],
+      MyFavouriteIds: []
     }
   }
   state = this.state;
   HandelSearch = () => {
-    let found = CharecterLists.find(({ Name }) => Name === this.state.SearchContent);
-    this.setState({
-      SearchCharacters: [found]
+    axios.get(`https://www.breakingbadapi.com/api/characters`,{
+      params:{
+        name:this.state.SearchContent
+      }
     })
+      .then(response => {
+        console.log("my user search response", response);
+          if (response.status == 200) {
+         this.setState({
+          SearchCharacters:response.data
+          })
+          }      
+      })
+      .catch(error => {
+        console.error(error.data)
+      })
   }
   GoToDeatails = (CharacterID) => {
-    this.props.navigation.navigate('details', { "PressedCharacterID": CharacterID })
+    let res = this.state.SearchCharacters.find(obj => { return obj.char_id === CharacterID })
+    this.props.navigation.navigate('details', { "PressedCharacter": res })
   }
 
   HandelFavuriteClick = (FavouriteID) => {
-    console.log("my fav id search", FavouriteID);
+    console.log("array", this.state.MyFavouriteIds);
+    if(this.state.MyFavouriteIds.indexOf(FavouriteID) !== -1){
+      this.state.MyFavouriteIds.splice(this.state.MyFavouriteIds.indexOf(FavouriteID),1)
+    }
+    else{
+      this.state.MyFavouriteIds.push(FavouriteID)
+    }
+    this.setState({
+      MyFavouriteIds:this.state.MyFavouriteIds
+    })
+    console.log("array11", this.state.MyFavouriteIds);
   }
   render() {
     return (
@@ -71,6 +96,7 @@ export default class Search extends Component {
               autoFocus={false}
               placeholder={'Search'}
               keyboardType={"default"}
+              fontFamily={'Roboto-Light'}
               onChangeText={text =>
                 this.setState({
                   SearchContent: text
@@ -96,18 +122,19 @@ export default class Search extends Component {
               renderItem={({ item }) => (
                 <View>
                   <CharecterList
-                    CharecterID={item.id}
-                    CahrecterImage={item.Image}
-                    CharecterNickName={item.NickName}
-                    CahrecterName={item.Name}
+                    CharecterID={item.char_id}
+                    CahrecterImage={item.img}
+                    CharecterNickName={item.nickname}
+                    CahrecterName={item.name}
                     navigation={this.props.navigation}
                     ScreenName={"search"}
                     HandelCharacterTouch={(id) => this.GoToDeatails(id)}
                     HandelFavouriteCharecter={(id) => this.HandelFavuriteClick(id)}
+                    FavouriteID={this.state.MyFavouriteIds}
                   />
                 </View>
               )}
-              keyExtractor={item => item.id}
+              keyExtractor={item => item.char_id}
             />
           </View>
         </View>

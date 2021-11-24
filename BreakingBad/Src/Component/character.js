@@ -10,30 +10,8 @@ const Deviceheight = Dimensions.get('window').height;
 
 
 const CharectersList = (props) => {
-
-    const [HeartClicked, SetHeartClicked] = useState(props.ScreenName == "home" || props.ScreenName == "search" ? false : true);
-    useEffect(() => {
-
-    }, [])
-
     const HandelClick = () => {
-
-        if (props.ScreenName == "home") {
-            SetHeartClicked(true)
-            let id = props.CharecterID
-            props.HandelFavouriteCharecter(id)
-        }
-        else if (props.ScreenName == "search") {
-            SetHeartClicked(true)
-            let id = props.CharecterID
-            props.HandelFavouriteCharecter(id)
-        }
-        else if (props.ScreenName == "favourite") {
-            SetHeartClicked(false)
-        }
-        else {
-            null
-        }
+        props.HandelFavouriteCharecter(props.CharecterID)
     }
 
     const HandelImageTouch = () => {
@@ -46,7 +24,7 @@ const CharectersList = (props) => {
                 <TouchableOpacity style={styles.MyImageContainer} onPress={() => HandelImageTouch()}>
                     <Image
                         style={styles.MyImage}
-                        source={props.CahrecterImage} />
+                        source={{ uri: props.CahrecterImage }} />
                 </TouchableOpacity>
                 <View style={styles.SecondContainerMainView}>
                     <View style={styles.NameContainer}>
@@ -54,11 +32,13 @@ const CharectersList = (props) => {
                         <Text style={styles.CharecterNickName}>{props.CharecterNickName}</Text>
                     </View>
                     <TouchableOpacity style={styles.SearchIcon} onPress={() => HandelClick()} >
-                        {HeartClicked == false ?
-                            <Feather name="heart" size={24} style={{ alignSelf: "center" }} color="#ffffff" />
-                            :
+                        {/* {HeartClicked == false ? */}
+                        {props.FavouriteID.indexOf(props.CharecterID) !== -1 ?
                             <FontAwesome name="heart" size={24} style={{ alignSelf: "center" }} color="#18ca75" />
+                            :
+                            <Feather name="heart" size={24} style={{ alignSelf: "center" }} color="#ffffff" />
                         }
+
                     </TouchableOpacity>
                 </View>
             </View>
@@ -115,12 +95,14 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: "#ffffff",
         textAlign: "left",
-        fontWeight: "bold"
+        fontWeight: "bold",
+        fontFamily: 'Roboto-Light'
     },
     CharecterNickName: {
         fontSize: 15,
         color: "#ffffff",
-        textAlign: "left"
+        textAlign: "left",
+        fontFamily: 'Roboto-Thin'
     },
     SearchIcon: {
         height: Deviceheight / 23,
